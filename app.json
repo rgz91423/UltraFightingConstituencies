@@ -6,7 +6,7 @@
     "description": "An empty new project",
     "slug": "wordpress-api",
     "privacy": "public",
-    "sdkVersion": "21.0.0",
+    "sdkVersion": "27.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
