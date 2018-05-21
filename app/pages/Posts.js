@@ -19,7 +19,7 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 */
 export default class Posts extends React.Component {
 
-    _keyExtractor = (item, index) => item.id;
+    _keyExtractor = (item, index) => ""+item.id;
 
     
 
@@ -28,14 +28,15 @@ export default class Posts extends React.Component {
         this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
         this.state = {
             isLoading: true,
-            categoryId: categoryId
+            categoryId: categoryId,
+            posts: undefined
         };
     }
 
     componentWillMount() {
         this.state = {
             isLoading: true,
-        }
+        };
         this.fetchAllPosts();
         /*
         this.itemsRef.on('value', (item) => {
@@ -81,37 +82,25 @@ export default class Posts extends React.Component {
 
 
     render() {
-        const isLoading = this.state.isLoading;
-
-        if (isLoading) {
-            return (
-            <View style={styles.container}>
-                <Header
-                    leftComponent={{ icon: 'menu', color: '#fff' }}
-                    centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
-                    />
-                <Text>Loading...</Text>
-            </View>
-            )
-        }
+        
         return (
-           
             <View style={styles.container}>
                 <Header
                 leftComponent={{ icon: 'menu', color: '#fff' }}
                 centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
                 />
-               
-               <FlatList
-                keyExtractor={this._keyExtractor}
-                data={this.state.posts}
-                renderItem={this.renderPost}
-                />
-
+                {
+                    (this.state.isLoading==true) ?  (
+                        <Text>Loading...</Text>
+                    ) : (<FlatList
+                            keyExtractor={this._keyExtractor}
+                            data={this.state.posts}
+                            renderItem={this.renderPost}
+                            />
+                        )
+                }
 
             </View>
-
-            
         )
     }
 }

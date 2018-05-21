@@ -21,9 +21,9 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 */
 const WIDTH = Dimensions.get('window').width;
 
-export default class Category extends React.Component {
+export default class Categories extends React.Component {
 
-    _keyExtractor = (item, index) => item.id;
+    _keyExtractor = (item, index) => ""+item.id;
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
         super();
@@ -38,7 +38,7 @@ export default class Category extends React.Component {
         this.state = {
             isLoading: true,
         }
-        this.fetchAllPosts();
+        this.fetchAllCategorues();
         /*
         this.itemsRef.on('value', (item) => {
             
@@ -86,15 +86,20 @@ export default class Category extends React.Component {
         try {
             var imgUrl = item.better_featured_image.media_details.sizes.thumbnail.source_url; 
             return (
-            <Image
-                animation={'bounceIn'}
-                duration={500}
-                source={{uri: imgUrl}}
-                style={{
-                    width: WIDTH / 3,
-                    height: WIDTH /3
-                }}
-            />
+                <ListItem
+                title={item.name}
+                //subtitle={item.subtitle}
+                //leftAvatar={{ source: { uri: item.avatar_url } }}
+              />    
+            //<Image
+              //  animation={'bounceIn'}
+               // duration={500}
+                //source={{uri: imgUrl}}
+                //style={{
+                 //   width: WIDTH / 3,
+                //    height: WIDTH /3
+                //}}
+            ///>
             );
             
           } catch (e) {

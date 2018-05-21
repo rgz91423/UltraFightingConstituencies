@@ -3,8 +3,10 @@ import { Image, StyleSheet } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import Posts from './Posts';
 import GalleryPage from './GalleryPage';
+import Categories from './Categories';
 import Home from './Home'
 import { Icon } from 'react-native-elements';
+import { AppFontLoader } from '../utils/AppFontLoader';
 
 
 const App = TabNavigator({
@@ -23,6 +25,17 @@ const App = TabNavigator({
     name: "Novel",
     description: "Posts Tab",
     screen: Posts,
+    navigationOptions: ({navigation}) => ({
+      tabBarLabel: "小說",
+      tabBarIcon: ({tintColor}) => (
+        <Icon name="ios-book-outline" type='ionicon' color={tintColor} size={iconSize}  />
+      ),
+    }),
+  },
+  Categories: {
+    name: "Categories",
+    description: "Categories Tab",
+    screen: Categories,
     navigationOptions: ({navigation}) => ({
       tabBarLabel: "小說",
       tabBarIcon: ({tintColor}) => (
@@ -74,4 +87,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default () => <App />;
+export default () => (<AppFontLoader><App /></AppFontLoader>);
