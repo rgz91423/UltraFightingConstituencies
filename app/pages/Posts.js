@@ -18,7 +18,7 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 */
 export default class Posts extends React.Component {
 
-    _keyExtractor = (item, index) => ""+item.id;
+    _keyExtractor = (item, index) => String(item.id);
 
     
 
@@ -32,8 +32,8 @@ export default class Posts extends React.Component {
         };
     }
 
-    componentDidMount() {
-        
+    componentWillMount() {
+        this._isMounted = false;
         //this.fetchAllPosts();
         /*
         this.itemsRef.on('value', (item) => {
@@ -54,12 +54,18 @@ export default class Posts extends React.Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
+        this.state = {
+            isLoading: true
+        };
         this.fetchAllPosts();
     }
 
     fetchAllPosts() {
         WordpressService.getPosts(this.state.categoryId)
         .then((responseData) => {
+            //responseData.forEach()
+
             this.setState({
                 isLoading: false,
                 posts: responseData

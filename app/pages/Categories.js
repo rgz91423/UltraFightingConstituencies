@@ -22,11 +22,12 @@ const WIDTH = Dimensions.get('window').width;
 
 export default class Categories extends React.Component {
 
-    _keyExtractor = (item, index) => ""+item.id;
+    _keyExtractor = (item, index) => String(item.id);
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
         super();
         this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
+        this.mounted = true;
         this.state = {
             isLoading: true,
             categoryId: categoryId
@@ -34,7 +35,7 @@ export default class Categories extends React.Component {
     }
 
     componentWillMount() {
-       
+        this._isMounted = false;
         /*
         this.itemsRef.on('value', (item) => {
             
@@ -54,6 +55,10 @@ export default class Categories extends React.Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
+        this.state = {
+            isLoading: true
+        };
         this.fetchAllCategorues();
     }
 
