@@ -4,6 +4,9 @@ import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import { Header, ListItem } from 'react-native-elements';
 
+import { YellowBox } from 'react-native';
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
+
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -24,7 +27,7 @@ export default class Posts extends React.Component {
 
     constructor(categoryId) {
         super();
-        this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
+       // this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
         this.state = {
             isLoading: true,
             categoryId: categoryId,
@@ -33,7 +36,6 @@ export default class Posts extends React.Component {
     }
 
     componentWillMount() {
-        this._isMounted = false;
         //this.fetchAllPosts();
         /*
         this.itemsRef.on('value', (item) => {
@@ -54,22 +56,25 @@ export default class Posts extends React.Component {
     }
 
     componentDidMount() {
-        this._isMounted = true;
         this.state = {
             isLoading: true
         };
         this.fetchAllPosts();
     }
 
+    componentWillUnmount() {
+
+    }
+
     fetchAllPosts() {
         WordpressService.getPosts(this.state.categoryId)
         .then((responseData) => {
             //responseData.forEach()
-
             this.setState({
                 isLoading: false,
                 posts: responseData
             })
+           
         })
         .done();
     }

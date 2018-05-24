@@ -3,9 +3,10 @@ import { StyleSheet, Text, View, WebView, FlatList, Image, Dimensions } from 're
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
-import { Header } from 'react-native-elements';
+import { Header, ListItem } from 'react-native-elements';
 
-
+import { YellowBox } from 'react-native';
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -35,7 +36,6 @@ export default class Categories extends React.Component {
     }
 
     componentWillMount() {
-        this._isMounted = false;
         /*
         this.itemsRef.on('value', (item) => {
             
@@ -55,7 +55,6 @@ export default class Categories extends React.Component {
     }
 
     componentDidMount() {
-        this._isMounted = true;
         this.state = {
             isLoading: true
         };
@@ -75,41 +74,23 @@ export default class Categories extends React.Component {
 
     getThumbnail(category) {
         try {
-          return category.better_featured_image.media_details.sizes.thumbnail.source_url; 
+          return category.img_thumbnail; 
         } catch (e) {
           return undefined;
         }
       }
 
-    renderPost({ item , idx}) {
-
-        try {
-            var imgUrl = item.better_featured_image.media_details.sizes.thumbnail.source_url; 
-            return (
-                <ListItem
-                title={item.name}
-                //subtitle={item.subtitle}
-                //leftAvatar={{ source: { uri: item.avatar_url } }}
-              />    
-            //<Image
-              //  animation={'bounceIn'}
-               // duration={500}
-                //source={{uri: imgUrl}}
-                //style={{
-                 //   width: WIDTH / 3,
-                //    height: WIDTH /3
-                //}}
-            ///>
-            );
+    renderPost = ({ item }) => (
             
-          } catch (e) {
-              var jsonStr = JSON.stringify(item);
-            return (<Text>Tiger</Text>);
-          }
-          
-
-           
-    }
+            <ListItem
+                title={item.name}
+                subtitle={item.count+"篇"}
+                avatar={{
+                    size:"large",
+                    source: item.img_thumbnail && { uri: item.img_thumbnail }
+                }}
+            />  
+    )
 
 
     render() {

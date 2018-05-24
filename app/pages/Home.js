@@ -14,6 +14,7 @@ export default class Home extends React.Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
         //this.fetchMenuItems();
     }
 
@@ -25,12 +26,13 @@ export default class Home extends React.Component {
 
     render() {
         const isLoadingMenu = this.state.isLoadingMenu;
+                /*{ isLoadingMenu ? <Text>Loading Menu...</Text>: this.state.menu.map(this.renderMenuItem) }*/
+             
         
         return (
             <View style={styles.container}>
                 <View style={styles.card} >
                     <Text>Home Screen</Text>
-                    { isLoadingMenu ? <Text>Loading Menu...</Text>: this.state.menu.map(this.renderMenuItem) }
                 </View>
                     <TouchableHighlight onPress={() => this.goToPage('Posts')}>
                         <View style={styles.card}>

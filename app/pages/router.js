@@ -1,6 +1,6 @@
 import  React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
-import { TabNavigator, StackNavigator } from 'react-navigation';
+import { createBottomTabNavigator } from 'react-navigation';
 import Posts from './Posts';
 import Gallery from './Gallery';
 import Categories from './Categories';
@@ -8,7 +8,7 @@ import Home from './Home'
 import { Icon } from 'react-native-elements';
 
 
-const App = TabNavigator({
+const App = createBottomTabNavigator({
   Home: {
     name: "Home",
     description: "Home Tab",

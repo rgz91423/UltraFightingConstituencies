@@ -5,7 +5,8 @@ import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
 import { Header } from 'react-native-elements';
 
-
+import { YellowBox } from 'react-native';
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -26,7 +27,7 @@ export default class Gallery extends React.Component {
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
         super();
-        this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
+        //this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
         this.state = {
             isLoading: true,
             categoryId: categoryId
@@ -34,7 +35,6 @@ export default class Gallery extends React.Component {
     }
 
     componentWillMount() {
-        this._isMounted = false;
         /*
         this.itemsRef.on('value', (item) => {
             
@@ -54,7 +54,6 @@ export default class Gallery extends React.Component {
     }
 
     componentDidMount() {
-        this._isMounted = true;
         this.state = {
             isLoading: true
         };
@@ -80,14 +79,14 @@ export default class Gallery extends React.Component {
         }
       }
 
-    renderPost =  item  => {
+    renderPost =  ({ item })  => {
 
         var imgUrl=this.getThumbnail(item);
 
         return (<Image
             animation={'bounceIn'}
             duration={500}
-            source={{uri: imgUrl}}
+            source={imgUrl && { uri: imgUrl }}
             style={styles.image}
         />)
            
@@ -110,6 +109,7 @@ export default class Gallery extends React.Component {
                             keyExtractor={this._keyExtractor}
                             data={this.state.posts}
                             renderItem={this.renderPost}
+                            onEndReached={this.doInfinite}
                             />
                         )
                 }
@@ -117,6 +117,19 @@ export default class Gallery extends React.Component {
             </View>
         );
     }
+
+
+    doInfinite() {
+        if (this.state.posts==undefined) return;
+        let page = (Math.ceil(this.state.posts.length/Config.QUERY_SIZE_GALLERY)) + 1;
+      
+        WordpressService.getGallery(5, page)
+        .then(data => {
+            this.state.posts.concat(data);
+           
+        }).done();
+      }
+    
 }
 
 const styles = StyleSheet.create({
