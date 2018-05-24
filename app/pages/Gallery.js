@@ -30,7 +30,8 @@ export default class Gallery extends React.Component {
         //this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
         this.state = {
             isLoading: true,
-            categoryId: categoryId
+            categoryId: categoryId,
+            posts: undefined
         };
     }
 
@@ -120,14 +121,15 @@ export default class Gallery extends React.Component {
 
 
     doInfinite() {
-        if (this.state.posts==undefined) return;
-        let page = (Math.ceil(this.state.posts.length/Config.QUERY_SIZE_GALLERY)) + 1;
-      
-        WordpressService.getGallery(5, page)
-        .then(data => {
-            this.state.posts.concat(data);
-           
-        }).done();
+        try {
+            let page = (Math.ceil(this.state.posts.length/Config.QUERY_SIZE_GALLERY)) + 1;
+        
+            WordpressService.getGallery(5, page)
+            .then(data => {
+                this.state.posts.concat(data);
+            
+            }).done();
+        } catch (e) {}
       }
     
 }
