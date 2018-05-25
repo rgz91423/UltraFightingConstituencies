@@ -5,8 +5,7 @@ import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
 import { Header } from 'react-native-elements';
 
-import { YellowBox } from 'react-native';
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
+
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -99,7 +98,6 @@ export default class Gallery extends React.Component {
         return (
             <View style={styles.container}>
                 <Header
-                leftComponent={{ icon: 'menu', color: '#fff' }}
                 centerComponent={{ text: '插圖', style: { color: '#fff' } }}
                 />
                 {
@@ -111,6 +109,7 @@ export default class Gallery extends React.Component {
                             data={this.state.posts}
                             renderItem={this.renderPost}
                             onEndReached={this.doInfinite}
+                            onEndReachedThreshold={0.5}
                             />
                         )
                 }
@@ -120,16 +119,18 @@ export default class Gallery extends React.Component {
     }
 
 
-    doInfinite() {
-        try {
+    doInfinite = () => {
+       // try {
             let page = (Math.ceil(this.state.posts.length/Config.QUERY_SIZE_GALLERY)) + 1;
         
             WordpressService.getGallery(5, page)
             .then(data => {
-                this.state.posts.concat(data);
-            
+                console.log('onEndReached()', this.state.posts)
+                let curData = this.state.posts
+                let newData = curData.concat(data);
+                this.setState({posts: newData})
             }).done();
-        } catch (e) {}
+       // } catch (e) {}
       }
     
 }

@@ -55,7 +55,7 @@ const App = createBottomTabNavigator({
   },
 }, {
   tabBarPosition: "bottom",
-  initialRouteName: "Posts",
+  initialRouteName: "Categories",
   animationEnabled: true,
   swipeEnabled: true,
   tabBarOptions: {

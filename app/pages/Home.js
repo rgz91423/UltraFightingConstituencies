@@ -7,10 +7,7 @@ export default class Home extends React.Component {
 
     constructor() {
         super();
-        this.state = {
-            isLoadingMenu: true,
-            menu: ''
-        }
+       
     }
 
     componentDidMount() {
@@ -25,8 +22,6 @@ export default class Home extends React.Component {
     
 
     render() {
-        const isLoadingMenu = this.state.isLoadingMenu;
-                /*{ isLoadingMenu ? <Text>Loading Menu...</Text>: this.state.menu.map(this.renderMenuItem) }*/
              
         
         return (

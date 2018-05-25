@@ -5,8 +5,6 @@ import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
 import { Header, ListItem } from 'react-native-elements';
 
-import { YellowBox } from 'react-native';
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -58,6 +56,7 @@ export default class Categories extends React.Component {
         this.state = {
             isLoading: true
         };
+        
         this.fetchAllCategorues();
     }
 
@@ -80,10 +79,16 @@ export default class Categories extends React.Component {
         }
       }
 
+    goToPage(item) {
+        this.props.navigation.navigate('Posts',{categoryId: item.id});
+    }
+
+
     renderPost = ({ item }) => (
             
             <ListItem
                 title={item.name}
+                onPress={() => this.goToPage(item)}
                 subtitle={item.count+"篇"}
                 avatar={{
                     size:"large",
@@ -100,7 +105,6 @@ export default class Categories extends React.Component {
             return (
             <View style={styles.container}>
                 <Header
-                    leftComponent={{ icon: 'menu', color: '#fff' }}
                     centerComponent={{ text: '小說連載', style: { color: '#fff' } }}
                     />
                 <Text>Loading...</Text>

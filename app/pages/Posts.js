@@ -4,8 +4,6 @@ import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import { Header, ListItem } from 'react-native-elements';
 
-import { YellowBox } from 'react-native';
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 // Initialize Firebase
 /*
@@ -25,12 +23,13 @@ export default class Posts extends React.Component {
 
     
 
-    constructor(categoryId) {
+    constructor() {
         super();
        // this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
+       
         this.state = {
             isLoading: true,
-            categoryId: categoryId,
+            category: undefined,
             posts: undefined
         };
     }
@@ -56,27 +55,47 @@ export default class Posts extends React.Component {
     }
 
     componentDidMount() {
+       
+        const { navigation } = this.props;
+        const categoryId = navigation.getParam('categoryId', 'NO-ID');
+
         this.state = {
-            isLoading: true
+            isLoading: true,
         };
-        this.fetchAllPosts();
+      
+        this.fetchAll(categoryId);
     }
 
     componentWillUnmount() {
 
     }
 
-    fetchAllPosts() {
-        WordpressService.getPosts(this.state.categoryId)
-        .then((responseData) => {
-            //responseData.forEach()
+    goBack() {
+        this.props.navigation.goBack();
+    }
+
+
+    fetchAll(categoryId) {
+        this.fetchCategory(categoryId).then(category=>{
             this.setState({
-                isLoading: false,
-                posts: responseData
-            })
-           
-        })
-        .done();
+                category: category
+            });
+            this.fetchAllPosts(categoryId).then(posts=>{
+                this.setState({
+                    isLoading:false,
+                    posts: posts
+                });
+            }).done();
+        }).done();
+    }
+
+    fetchCategory(categoryId) {
+   
+        return WordpressService.getCategory(categoryId);
+    }
+
+    fetchAllPosts(categoryId) {
+        return WordpressService.getPosts(categoryId);
     }
 
     renderPost = ({ item }) => (
@@ -89,12 +108,12 @@ export default class Posts extends React.Component {
 
 
     render() {
-        
+
         return (
             <View style={styles.container}>
                 <Header
-                leftComponent={{ icon: 'menu', color: '#fff' }}
-                centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
+                leftComponent={{ icon: 'chevron-left', color: '#fff', onPress: () => this.props.navigation.goBack() }}
+                centerComponent={{ text: (this.state.isLoading ? '' : this.state.category.name), style: { color: '#fff' } }}
                 />
                 {
                     (this.state.isLoading==true) ?  (
