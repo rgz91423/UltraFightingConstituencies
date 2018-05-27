@@ -30,7 +30,8 @@ export default class Gallery extends React.Component {
         this.state = {
             isLoading: true,
             categoryId: categoryId,
-            posts: undefined
+            posts: undefined,
+            modalVisible: false
         };
     }
 
@@ -51,6 +52,10 @@ export default class Gallery extends React.Component {
             }
             
         });*/
+    }
+
+    setModalVisible(visible) {
+        this.setState({modalVisible: visible});
     }
 
     componentDidMount() {
@@ -88,6 +93,9 @@ export default class Gallery extends React.Component {
             duration={500}
             source={imgUrl && { uri: imgUrl }}
             style={styles.image}
+            onPress={() => {
+                this.setModalVisible(!this.state.modalVisible);
+              }}
         />)
            
     }
@@ -103,7 +111,8 @@ export default class Gallery extends React.Component {
                 {
                     (this.state.isLoading==true) ?  (
                         <Text>Loading...</Text>
-                    ) : (<FlatList
+                    ) : (
+                            <View><FlatList
                             numColumns={3}
                             keyExtractor={this._keyExtractor}
                             data={this.state.posts}
@@ -111,6 +120,36 @@ export default class Gallery extends React.Component {
                             onEndReached={this.doInfinite}
                             onEndReachedThreshold={0.5}
                             />
+                            <Modal
+                            animationType="slide"
+                            transparent={false}
+                            visible={this.state.modalVisible}
+                            onRequestClose={() => {
+                              alert('Modal has been closed.');
+                            }}>
+                            <View style={{marginTop: 22}}>
+                              <View>
+                              <FlatList
+                                horizontal={true}
+                                keyExtractor={this._keyExtractor}
+                                data={this.state.posts}
+                                renderItem={this.renderPost}
+                                onEndReached={this.doInfinite}
+                                onEndReachedThreshold={0.5}
+                                />
+                  
+                                <TouchableHighlight
+                                  onPress={() => {
+                                    this.setModalVisible(!this.state.modalVisible);
+                                  }}>
+                                  <Text>Hide Modal</Text>
+                                </TouchableHighlight>
+                              </View>
+                            </View>
+                          </Modal>
+                          </View>
+
+                            
                         )
                 }
 
