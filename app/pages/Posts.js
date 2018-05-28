@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Modal, TouchableHighlight } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import { Header, ListItem } from 'react-native-elements';
 
-
+import Swiper from 'react-native-swiper';
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -19,7 +19,7 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 */
 export default class Posts extends React.Component {
 
-    _keyExtractor = (item, index) => String(item.id);
+    _keyExtractor = (item, index) => "post_"+item.id;
 
     
 
@@ -30,7 +30,9 @@ export default class Posts extends React.Component {
         this.state = {
             isLoading: true,
             category: undefined,
-            posts: undefined
+            posts: undefined,
+            modalVisible: false,
+            showIndex: 0
         };
     }
 
@@ -61,6 +63,8 @@ export default class Posts extends React.Component {
 
         this.state = {
             isLoading: true,
+            modalVisible: false,
+            showIndex: 0
         };
       
         this.fetchAll(categoryId);
@@ -70,10 +74,59 @@ export default class Posts extends React.Component {
 
     }
 
+    postTapped(index) {
+            /*this.navCtrl.push(PostPage, {
+        id: post.id,
+        next:this.getNext.bind(this),
+        prev:this.getPrev.bind(this)
+        });*/
+        this.setState({showIndex:index,modalVisible: true});
+
+        let post = this.state.posts[index];
+
+        if(!post || !post.detailed){
+            
+            WordpressService.getPost(post.id)
+            .then(post => {
+                post.detailed=true;
+                
+                //loading.dismiss();
+                this.getCategories(post).then(cats=>{
+                    post.categories = cats;
+                    let tmpPosts = this.state.posts;
+                    tmpPosts[index] = post;
+                    this.setState({posts: tmpPosts});
+                    console.log(post);
+
+                });
+                
+                
+            });
+          }
+      
+
+    }
+
+    setModalVisible(visible) {
+        this.setState({modalVisible: visible});
+    }
+
     goBack() {
         this.props.navigation.goBack();
     }
 
+
+    getAuthorData(post){
+        return WordpressService.getAuthor(post.author);
+    }
+
+    getCategories(post){
+        return WordpressService.getPostCategories(post);
+    }
+
+    getComments(post){
+        return WordpressService.getComments(post.id);
+    }
 
     fetchAll(categoryId) {
         this.fetchCategory(categoryId).then(category=>{
@@ -98,11 +151,13 @@ export default class Posts extends React.Component {
         return WordpressService.getPosts(categoryId);
     }
 
-    renderPost = ({ item }) => (
+    renderPost = ({ item, index }) => (
         <ListItem
           title={item.title.rendered}
           //subtitle={item.subtitle}
           //leftAvatar={{ source: { uri: item.avatar_url } }}
+            onPress={() =>  this.postTapped(index)}
+            
         />
     )
 
@@ -118,11 +173,37 @@ export default class Posts extends React.Component {
                 {
                     (this.state.isLoading==true) ?  (
                         <Text>Loading...</Text>
-                    ) : (<FlatList
+                    ) : (<View><FlatList
                             keyExtractor={this._keyExtractor}
                             data={this.state.posts}
                             renderItem={this.renderPost}
                             />
+                            <Modal
+                            animationType="slide" 
+                            transparent={false}
+                            visible={this.state.modalVisible}
+                            onRequestClose={() => {
+                              alert('Modal has been closed.');
+                            }}>
+                            <View style={styles.container}>
+                            <Header
+                            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(!this.state.modalVisible) }}
+                            />
+
+                            <Swiper index={this.state.showIndex}>
+                            {
+                                this.state.posts.map((item, i) => (
+                                <View >
+                                    <Text>{item.title.rendered}</Text>
+                                    <Text>{(item.content && item.content.rendered) ? item.content.rendered: ''}</Text>
+                                </View>
+                                ))
+                            }
+                            </Swiper>
+                               
+                            </View>
+                          </Modal>
+                          </View>
                         )
                 }
 

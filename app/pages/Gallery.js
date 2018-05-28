@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View, WebView, ScrollView, FlatList, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, Dimensions, Modal, TouchableHighlight } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
 import { Header } from 'react-native-elements';
 
-
+import Swiper from 'react-native-swiper';
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -22,7 +22,8 @@ const WIDTH = Dimensions.get('window').width;
 
 export default class Gallery extends React.Component {
 
-    _keyExtractor = (item, index) => String(item.id);
+    _keyExtractor = (item, index) => "gallery_"+item.id;
+    _keyExtractorDetail = (item, index) => "gallery_detail_"+item.id;
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
         super();
@@ -60,7 +61,8 @@ export default class Gallery extends React.Component {
 
     componentDidMount() {
         this.state = {
-            isLoading: true
+            isLoading: true,
+            modalVisible: false
         };
         this.fetchAllPosts();
     }
@@ -88,15 +90,14 @@ export default class Gallery extends React.Component {
 
         var imgUrl=this.getThumbnail(item);
 
-        return (<Image
-            animation={'bounceIn'}
-            duration={500}
-            source={imgUrl && { uri: imgUrl }}
-            style={styles.image}
-            onPress={() => {
-                this.setModalVisible(!this.state.modalVisible);
-              }}
-        />)
+        return (
+            <TouchableHighlight style={styles.button} onPress={() =>  this.setModalVisible(!this.state.modalVisible)}>
+                <Image
+                source={imgUrl && { uri: imgUrl }}
+                style={styles.image}
+                />
+            </TouchableHighlight>
+        )
            
     }
 
@@ -112,7 +113,8 @@ export default class Gallery extends React.Component {
                     (this.state.isLoading==true) ?  (
                         <Text>Loading...</Text>
                     ) : (
-                            <View><FlatList
+                            <View>
+                                <FlatList
                             numColumns={3}
                             keyExtractor={this._keyExtractor}
                             data={this.state.posts}
@@ -120,31 +122,37 @@ export default class Gallery extends React.Component {
                             onEndReached={this.doInfinite}
                             onEndReachedThreshold={0.5}
                             />
+                            
                             <Modal
-                            animationType="slide"
+                            animationType="slide" 
                             transparent={false}
                             visible={this.state.modalVisible}
                             onRequestClose={() => {
                               alert('Modal has been closed.');
                             }}>
-                            <View style={{marginTop: 22}}>
-                              <View>
-                              <FlatList
-                                horizontal={true}
-                                keyExtractor={this._keyExtractor}
-                                data={this.state.posts}
-                                renderItem={this.renderPost}
-                                onEndReached={this.doInfinite}
-                                onEndReachedThreshold={0.5}
-                                />
+                            <View style={styles.container}>
+                            <Header
+                            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(!this.state.modalVisible) }}
+                            />
+
+                            <Swiper showsButtons={true}>
+                            {
+                                this.state.posts.map((item, i) => (
+                                <View >
+                                    <Text>{item.content.rendered}</Text>
+                                </View>
+                                ))
+                            }
+                            </Swiper>
+                             
                   
-                                <TouchableHighlight
+                                <TouchableHighlight style={styles.button}
                                   onPress={() => {
                                     this.setModalVisible(!this.state.modalVisible);
                                   }}>
                                   <Text>Hide Modal</Text>
                                 </TouchableHighlight>
-                              </View>
+                             
                             </View>
                           </Modal>
                           </View>
@@ -199,9 +207,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#00BCD4'
    
   }, 
+  button: {
+    flex:2,
+  },
   image: {
     height: WIDTH /3,
-    margin: 0,
+    margin: 1,
     flex:1,
   }
 });

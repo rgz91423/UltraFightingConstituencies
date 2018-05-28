@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, WebView, FlatList, Image, Dimensions } from 're
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
-import { Header, ListItem } from 'react-native-elements';
+import { Header, ListItem, Avatar } from 'react-native-elements';
 
 // Initialize Firebase
 /*
@@ -21,7 +21,7 @@ const WIDTH = Dimensions.get('window').width;
 
 export default class Categories extends React.Component {
 
-    _keyExtractor = (item, index) => String(item.id);
+    _keyExtractor = (item, index) => "category_"+item.id;
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
         super();
@@ -90,10 +90,11 @@ export default class Categories extends React.Component {
                 title={item.name}
                 onPress={() => this.goToPage(item)}
                 subtitle={item.count+"篇"}
-                avatar={{
-                    size:"large",
-                    source: item.img_thumbnail && { uri: item.img_thumbnail }
-                }}
+                containerStyle={{marginLeft:0, marginTop:0}}
+                avatar={<Avatar
+                    large
+                    source={item.img_thumbnail && {uri: item.img_thumbnail}}
+                />}
             />  
     )
 
