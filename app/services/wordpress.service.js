@@ -66,7 +66,7 @@ export class WordpressService {
   }
 
   static getPost(postId){
-    return this.http.get(Config.WORDPRESS_REST_API_URL + "posts/" + postId)
+    return fetch(Config.WORDPRESS_REST_API_URL + "posts/" + postId)
     .then(res => res.json());
   }
 
