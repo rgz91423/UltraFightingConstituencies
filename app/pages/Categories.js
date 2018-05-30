@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, WebView, FlatList, Image, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, WebView, FlatList, Image, Dimensions, ActivityIndicator } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
@@ -102,35 +102,28 @@ export default class Categories extends React.Component {
     render() {
         const isLoading = this.state.isLoading;
 
-        if (isLoading) {
-            return (
-            <View style={styles.container}>
-                <Header
-                    centerComponent={{ text: '小說連載', style: { color: '#fff' } }}
-                    />
-                <Text>Loading...</Text>
-            </View>
-            )
-        } else {
-            
             return (
                 <View style={styles.container}>
                     <Header
-                        leftComponent={{ icon: 'menu', color: '#fff' }}
                         centerComponent={{ text: '小說連載', style: { color: '#fff' } }}
                         />
-                
-                        
-                        <FlatList
-                        keyExtractor={this._keyExtractor}
-                        data={this.state.categories}
-                        renderItem={this.renderPost}
-                        />
+                        {
+                        isLoading ? (
+                            <View style={[styles.container,styles.horizontal]}>
+                                <ActivityIndicator size="large" />
+                            </View>
+                        ):(   
+                            <FlatList
+                            keyExtractor={this._keyExtractor}
+                            data={this.state.categories}
+                            renderItem={this.renderPost}
+                            />
+                          )
+                        }
                         
                 </View>
                 
             )
-        }
     }
 }
 
@@ -138,6 +131,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff'
+  },
+  horizontal: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10
   },
   card: {
       backgroundColor: '#fff',

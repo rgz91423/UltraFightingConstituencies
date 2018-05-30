@@ -1,10 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, Modal, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, WebView, FlatList, Modal, TouchableHighlight, ActivityIndicator } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
-import { Header, ListItem } from 'react-native-elements';
-
+import { Header, ListItem, Badge } from 'react-native-elements';
+import HTMLView from 'react-native-htmlview';
 import Swiper from 'react-native-swiper';
+
+
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -75,19 +77,18 @@ export default class Posts extends React.Component {
     }
 
     postTapped(index) {
-            /*this.navCtrl.push(PostPage, {
-        id: post.id,
-        next:this.getNext.bind(this),
-        prev:this.getPrev.bind(this)
-        });*/
-        this.setState({showIndex:index,modalVisible: true});
+         
+        this.setState({
+            showIndex:index,modalVisible: true
+        });
 
         let post = this.state.posts[index];
 
         if(!post || !post.detailed){
             
             WordpressService.getPost(post.id)
-            .then(post => {
+            .then(data => {
+                post = data;
                 post.detailed=true;
                 
                 //loading.dismiss();
@@ -96,7 +97,7 @@ export default class Posts extends React.Component {
                     let tmpPosts = this.state.posts;
                     tmpPosts[index] = post;
                     this.setState({posts: tmpPosts});
-                    console.log(post);
+                    console.log("returned:" + post.content.rendered);
 
                 });
                 
@@ -121,7 +122,7 @@ export default class Posts extends React.Component {
     }
 
     getCategories(post){
-        return WordpressService.getPostCategories(post);
+        return WordpressService.getPostCategories(post.id);
     }
 
     getComments(post){
@@ -161,6 +162,8 @@ export default class Posts extends React.Component {
         />
     )
 
+    
+
 
     render() {
 
@@ -172,7 +175,9 @@ export default class Posts extends React.Component {
                 />
                 {
                     (this.state.isLoading==true) ?  (
-                        <Text>Loading...</Text>
+                        <View style={[styles.container,styles.horizontal]}>
+                            <ActivityIndicator size="large" />
+                        </View>
                     ) : (<View><FlatList
                             keyExtractor={this._keyExtractor}
                             data={this.state.posts}
@@ -187,16 +192,44 @@ export default class Posts extends React.Component {
                             }}>
                             <View style={styles.container}>
                             <Header
-                            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(!this.state.modalVisible) }}
+                            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(false) }}
                             />
 
-                            <Swiper index={this.state.showIndex}>
+                            <Swiper 
+                            loop={false}
+                            showsPagination={false}
+                            index={this.state.showIndex}
+                            onIndexChanged={(index)=>this.postTapped(index)}
+                            >
                             {
                                 this.state.posts.map((item, i) => (
-                                <View >
-                                    <Text>{item.title.rendered}</Text>
-                                    <Text>{(item.content && item.content.rendered) ? item.content.rendered: ''}</Text>
-                                </View>
+                                //<ScrollView title={<Text numberOfLines={1}>{item.title.rendered}</Text>}>
+                                 //   <Text>{item.title.rendered}</Text>
+                                 //   <Text>{(item.content && item.content.rendered) ? item.content.rendered: ''}</Text>
+                                //</ScrollView>
+                               
+                                    (item.content && item.content.rendered) ?
+                                    (
+                                        <ScrollView style={styles.container}>
+                                        {
+                                        item.categories.map((category, i) => (
+                                            <Badge value={category.name} />
+                                        ))   
+                                        }
+                                        <Text>{item.title.rendered}</Text>
+                                        <HTMLView 
+                                        styleSheet={styles.htmlstyles}
+                                        title={item.title.rendered} 
+                                        value={item.content.rendered}
+                                        />
+                                        </ScrollView>
+                                    ) : (
+                                        <View style={[styles.container,styles.horizontal]}>
+                                        <ActivityIndicator size="large" />
+                                        </View>
+                                    )
+                               
+
                                 ))
                             }
                             </Swiper>
@@ -215,15 +248,31 @@ export default class Posts extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
-  card: {
-      backgroundColor: '#fff',
-      padding: 20,
-      marginTop: 0,
-      borderStyle: 'solid',
-      borderColor: '#ccc',
-      borderWidth: 1,
-      fontSize:20
+  horizontal: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10
   }
+ 
+  
 });
+var fontSize=18;
+var htmlstyles =StyleSheet.create({
+    a: {
+            fontWeight: '300',
+            fontSize:fontSize
+    },
+p:{
+    fontSize:fontSize,
+    marginBottom:10,
+},
+strong:{
+    fontWeight:'bold',
+    fontSize:fontSize
+},
+li:{
+    fontSize:fontSize,
+}
+})

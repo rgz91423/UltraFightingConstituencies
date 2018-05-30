@@ -30,14 +30,9 @@ export class WordpressService {
     .then(res => res.json());
   }
 
-  static getPostCategories(post){
-    let observableBatch = [];
-
-    post.categories.forEach(category => {
-      observableBatch.push(this.getCategory(category));
-    });
-
-    return Observable.forkJoin(observableBatch);
+  static getPostCategories(postId){
+    return fetch(Config.WORDPRESS_REST_API_URL + "categories?post=" + postId)
+    .then(res => res.json());
   }
 
   static getCategory(categoryId){
