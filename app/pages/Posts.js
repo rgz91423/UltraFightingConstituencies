@@ -25,55 +25,35 @@ export default class Posts extends React.Component {
 
     
 
-    constructor() {
-        super();
+    constructor(props) {
+        console.log("coinstruct");
+        super(props);
        // this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
        
         this.state = {
             isLoading: true,
-            category: undefined,
+            categoryId: undefined,
             posts: undefined,
             modalVisible: false,
             showIndex: 0
         };
+        this.fetchAll = this.fetchAll.bind(this);
     }
 
     componentWillMount() {
-        //this.fetchAllPosts();
-        /*
-        this.itemsRef.on('value', (item) => {
-            
-            console.log(item);
-            console.log(typeof item.val());
-            if (item.val() === true) {
-                console.log("Updating Value");
-                this.state = {
-                    isLoading: true,
-                }
-                this.fetchAllPosts();
-            } else {
-                console.log("No Update Needed");
-            }
-            
-        });*/
+        console.log("will mount");
+       
     }
 
     componentDidMount() {
-       
-        const { navigation } = this.props;
-        const categoryId = navigation.getParam('categoryId', 'NO-ID');
-
-        this.state = {
-            isLoading: true,
-            modalVisible: false,
-            showIndex: 0
-        };
+        console.log("did mount");
+        
       
-        this.fetchAll(categoryId);
+        this.fetchAll();
     }
 
     componentWillUnmount() {
-
+        console.log("will unmount");
     }
 
     postTapped(index) {
@@ -129,10 +109,21 @@ export default class Posts extends React.Component {
         return WordpressService.getComments(post.id);
     }
 
-    fetchAll(categoryId) {
+    fetchAll() {
+        
+        var categoryId = this.props.navigation.getParam('categoryId', 'NO-ID');
+        console.log("fetch all " + categoryId);
+
+        this.setState({
+            categoryId: categoryId,
+            isLoading: true,
+            modalVisible: false,
+            showIndex: 0
+        });
         this.fetchCategory(categoryId).then(category=>{
             this.setState({
-                category: category
+                category: category,
+                categoryId: category.id
             });
             this.fetchAllPosts(categoryId).then(posts=>{
                 this.setState({
@@ -162,81 +153,96 @@ export default class Posts extends React.Component {
         />
     )
 
+    renderLoading() {
+        return (<View style={[styles.container,styles.horizontal]}>
+            <ActivityIndicator size="large" />
+        </View>)
+    }
     
+    renderList(){
+        return (<FlatList
+                keyExtractor={this._keyExtractor}
+                data={this.state.posts}
+                renderItem={this.renderPost}
+                />)
+    }
+
+    renderModal() {
+    return (
+        <Modal
+            animationType="slide" 
+            transparent={false}
+            visible={this.state.modalVisible}
+            onRequestClose={() => {
+                alert('Modal has been closed.');
+            }}>
+            <View style={styles.container}>
+            <Header
+            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(false) }}
+            />
+
+            <Swiper 
+            loop={false}
+            showsPagination={false}
+            index={this.state.showIndex}
+            onIndexChanged={(index)=>this.postTapped(index)}
+            >
+            {
+                this.state.posts.map((item, i) => (
+                
+                    (item.content && item.content.rendered) ?
+                    (
+                        <ScrollView style={styles.container}>
+                        {
+                        item.categories.map((category, i) => (
+                            <Badge value={category.name} />
+                        ))   
+                        }
+                        <Text>{item.title.rendered}</Text>
+                        <HTMLView 
+                        stylesheet={styles.htmlstyles}
+                        title={item.title.rendered} 
+                        value={item.content.rendered}
+                        />
+                        </ScrollView>
+                    ) : 
+                        this.renderLoading()
+
+                ))
+            }
+            </Swiper>
+                
+            </View>
+            </Modal>)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // update original states
+        console.log("update " + nextProps.categoryId);
+        //this.setState({
+        //  latitude: nextProps.latitude,
+        //});
+        this.fetchAll();
+    }
 
 
     render() {
+
+        console.log("render");
 
         return (
             <View style={styles.container}>
                 <Header
                 leftComponent={{ icon: 'chevron-left', color: '#fff', onPress: () => this.props.navigation.goBack() }}
-                centerComponent={{ text: (this.state.isLoading ? '' : this.state.category.name), style: { color: '#fff' } }}
+                centerComponent={{ text: (this.state.isLoading ? '' : this.state.category.name+ "-"+ this.state.categoryId), style: { color: '#fff' } }}
                 />
                 {
-                    (this.state.isLoading==true) ?  (
-                        <View style={[styles.container,styles.horizontal]}>
-                            <ActivityIndicator size="large" />
+                    (this.state.isLoading==true) ?  
+                        this.renderLoading()
+                     : (<View>
+                        { this.renderList() }
+                        { this.renderModal() }
                         </View>
-                    ) : (<View><FlatList
-                            keyExtractor={this._keyExtractor}
-                            data={this.state.posts}
-                            renderItem={this.renderPost}
-                            />
-                            <Modal
-                            animationType="slide" 
-                            transparent={false}
-                            visible={this.state.modalVisible}
-                            onRequestClose={() => {
-                              alert('Modal has been closed.');
-                            }}>
-                            <View style={styles.container}>
-                            <Header
-                            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(false) }}
-                            />
-
-                            <Swiper 
-                            loop={false}
-                            showsPagination={false}
-                            index={this.state.showIndex}
-                            onIndexChanged={(index)=>this.postTapped(index)}
-                            >
-                            {
-                                this.state.posts.map((item, i) => (
-                                //<ScrollView title={<Text numberOfLines={1}>{item.title.rendered}</Text>}>
-                                 //   <Text>{item.title.rendered}</Text>
-                                 //   <Text>{(item.content && item.content.rendered) ? item.content.rendered: ''}</Text>
-                                //</ScrollView>
-                               
-                                    (item.content && item.content.rendered) ?
-                                    (
-                                        <ScrollView style={styles.container}>
-                                        {
-                                        item.categories.map((category, i) => (
-                                            <Badge value={category.name} />
-                                        ))   
-                                        }
-                                        <Text>{item.title.rendered}</Text>
-                                        <HTMLView 
-                                        styleSheet={styles.htmlstyles}
-                                        title={item.title.rendered} 
-                                        value={item.content.rendered}
-                                        />
-                                        </ScrollView>
-                                    ) : (
-                                        <View style={[styles.container,styles.horizontal]}>
-                                        <ActivityIndicator size="large" />
-                                        </View>
-                                    )
-                               
-
-                                ))
-                            }
-                            </Swiper>
-                               
-                            </View>
-                          </Modal>
-                          </View>
                         )
                 }
 
@@ -264,9 +270,12 @@ var htmlstyles =StyleSheet.create({
             fontWeight: '300',
             fontSize:fontSize
     },
-p:{
+p: {
     fontSize:fontSize,
-    marginBottom:10,
+},
+div: {
+    fontSize:fontSize,
+    marginBottom:5,
 },
 strong:{
     fontWeight:'bold',
