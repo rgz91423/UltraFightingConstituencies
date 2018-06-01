@@ -2,11 +2,11 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView, WebView, FlatList, Modal, TouchableHighlight, ActivityIndicator } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
-import { Header, ListItem, Badge } from 'react-native-elements';
-import HTMLView from 'react-native-htmlview';
+//import { Header } from 'react-native-elements';
+import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title } from 'native-base';
 import Swiper from 'react-native-swiper';
-
-
+import HTML from 'react-native-render-html';
+import { Icon } from 'react-native-elements';
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -32,7 +32,6 @@ export default class Posts extends React.Component {
        
         this.state = {
             isLoading: true,
-            categoryId: undefined,
             posts: undefined,
             modalVisible: false,
             showIndex: 0
@@ -48,8 +47,9 @@ export default class Posts extends React.Component {
     componentDidMount() {
         console.log("did mount");
         
-      
-        this.fetchAll();
+        var categoryId = this.props.navigation.getParam('categoryId', 'NO-ID');
+
+        this.fetchAll(categoryId);
     }
 
     componentWillUnmount() {
@@ -109,21 +109,17 @@ export default class Posts extends React.Component {
         return WordpressService.getComments(post.id);
     }
 
-    fetchAll() {
-        
-        var categoryId = this.props.navigation.getParam('categoryId', 'NO-ID');
+    fetchAll(categoryId) {
         console.log("fetch all " + categoryId);
-
+        
         this.setState({
-            categoryId: categoryId,
             isLoading: true,
             modalVisible: false,
             showIndex: 0
         });
         this.fetchCategory(categoryId).then(category=>{
             this.setState({
-                category: category,
-                categoryId: category.id
+                category: category
             });
             this.fetchAllPosts(categoryId).then(posts=>{
                 this.setState({
@@ -143,15 +139,19 @@ export default class Posts extends React.Component {
         return WordpressService.getPosts(categoryId);
     }
 
-    renderPost = ({ item, index }) => (
+    renderPost(item, index) {
+        return (
         <ListItem
-          title={item.title.rendered}
+          style={{ padding:14}}
           //subtitle={item.subtitle}
           //leftAvatar={{ source: { uri: item.avatar_url } }}
-            onPress={() =>  this.postTapped(index)}
-            
-        />
-    )
+            onPress={() =>  this.postTapped(index)}>
+            <Left><Text>{item.title.rendered}</Text></Left>
+            <Right>
+                <Icon name="arrow-forward" />
+            </Right>
+        </ListItem>)
+    }
 
     renderLoading() {
         return (<View style={[styles.container,styles.horizontal]}>
@@ -160,11 +160,13 @@ export default class Posts extends React.Component {
     }
     
     renderList(){
-        return (<FlatList
-                keyExtractor={this._keyExtractor}
-                data={this.state.posts}
-                renderItem={this.renderPost}
-                />)
+        return (<List >
+                {
+                    this.state.posts.map((item, i) => (
+                      this.renderPost(item,i)
+                    ))
+                  }
+                </List>)
     }
 
     renderModal() {
@@ -177,9 +179,18 @@ export default class Posts extends React.Component {
                 alert('Modal has been closed.');
             }}>
             <View style={styles.container}>
-            <Header
-            rightComponent={{ icon: 'close', style: { color: '#fff' }, onPress: () => this.setModalVisible(false) }}
-            />
+            
+            <Header>
+                <Left/>
+                <Body>
+                    <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
+                </Body>
+                <Right>
+                    <Button transparent onPress={ () => this.setModalVisible(false)}>
+                    <Icon name='close' />
+                    </Button>
+                </Right>
+            </Header>
 
             <Swiper 
             loop={false}
@@ -192,19 +203,23 @@ export default class Posts extends React.Component {
                 
                     (item.content && item.content.rendered) ?
                     (
-                        <ScrollView style={styles.container}>
-                        {
-                        item.categories.map((category, i) => (
-                            <Badge value={category.name} />
-                        ))   
-                        }
-                        <Text>{item.title.rendered}</Text>
-                        <HTMLView 
-                        stylesheet={styles.htmlstyles}
-                        title={item.title.rendered} 
-                        value={item.content.rendered}
-                        />
-                        </ScrollView>
+                        
+                        
+                        <Container style={styles.container}>
+                            <Content style={{padding:10}} >
+                                <View style={{flexDirection: "row"}}>
+                                {
+                                item.categories.map((category, i) => (
+                                    <Button style={styles.badgeButton} small warning rounded><Text>{category.name}</Text></Button>
+                                ))   
+                                }
+                                </View>
+                            
+                             <HTML baseFontStyle={{fontSize:18}} html={item.content.rendered} />
+                            </Content>
+                         </Container>
+                      
+                       
                     ) : 
                         this.renderLoading()
 
@@ -218,11 +233,13 @@ export default class Posts extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         // update original states
-        console.log("update " + nextProps.categoryId);
+        console.log(nextProps);
         //this.setState({
         //  latitude: nextProps.latitude,
         //});
-        this.fetchAll();
+        var categoryId = nextProps.navigation.getParam('categoryId', 'NO-ID');
+       
+        this.fetchAll(categoryId);
     }
 
 
@@ -231,22 +248,30 @@ export default class Posts extends React.Component {
         console.log("render");
 
         return (
-            <View style={styles.container}>
-                <Header
-                leftComponent={{ icon: 'chevron-left', color: '#fff', onPress: () => this.props.navigation.goBack() }}
-                centerComponent={{ text: (this.state.isLoading ? '' : this.state.category.name+ "-"+ this.state.categoryId), style: { color: '#fff' } }}
-                />
+            <Container>
+                 <Header>
+                    <Left>
+                        <Button transparent onPress={ () => this.props.navigation.goBack()}>
+                        <Icon name='left' />
+                        </Button>
+                    </Left>
+                    <Body>
+                        <Title>{(this.state.isLoading ? '' : this.state.category.name)}</Title>
+                    </Body>
+                    <Right/>
+                </Header>
+                
                 {
                     (this.state.isLoading==true) ?  
                         this.renderLoading()
-                     : (<View>
+                     : (<Content>
                         { this.renderList() }
                         { this.renderModal() }
-                        </View>
+                        </Content>
                         )
                 }
 
-            </View>
+            </Container>
         )
     }
 }
@@ -254,17 +279,20 @@ export default class Posts extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
   },
   horizontal: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 10
+  },
+  badgeButton: {
+      paddingLeft:10,paddingRight:10,margin:3
   }
  
   
 });
-var fontSize=18;
+var fontSize=48;
 var htmlstyles =StyleSheet.create({
     a: {
             fontWeight: '300',
@@ -272,10 +300,11 @@ var htmlstyles =StyleSheet.create({
     },
 p: {
     fontSize:fontSize,
+    marginBottom:0
 },
 div: {
     fontSize:fontSize,
-    marginBottom:5,
+    marginBottom:0,
 },
 strong:{
     fontWeight:'bold',
