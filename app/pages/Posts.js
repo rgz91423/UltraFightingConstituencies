@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, WebView, FlatList, Modal, TouchableHighlight, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, FlatList, Modal, TouchableHighlight, ActivityIndicator } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 //import { Header } from 'react-native-elements';
-import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title } from 'native-base';
+import { Container, Text, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon } from 'native-base';
 import Swiper from 'react-native-swiper';
 import HTML from 'react-native-render-html';
-import { Icon } from 'react-native-elements';
+//import { Icon } from 'react-native-elements';
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -141,12 +141,12 @@ export default class Posts extends React.Component {
 
     renderPost(item, index) {
         return (
-        <ListItem
-          style={{ padding:14}}
+        <ListItem noIndent key={"pos_"+item.id}
+          
           //subtitle={item.subtitle}
           //leftAvatar={{ source: { uri: item.avatar_url } }}
             onPress={() =>  this.postTapped(index)}>
-            <Left><Text>{item.title.rendered}</Text></Left>
+            <Left><Text style={{fontSize:20,padding:8}}>{item.title.rendered}</Text></Left>
             <Right>
                 <Icon name="arrow-forward" />
             </Right>
@@ -186,7 +186,7 @@ export default class Posts extends React.Component {
                     <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
                 </Body>
                 <Right>
-                    <Button transparent onPress={ () => this.setModalVisible(false)}>
+                    <Button large transparent onPress={ () => this.setModalVisible(false)}>
                     <Icon name='close' />
                     </Button>
                 </Right>
@@ -215,7 +215,7 @@ export default class Posts extends React.Component {
                                 }
                                 </View>
                             
-                             <HTML baseFontStyle={{fontSize:18}} html={item.content.rendered} />
+                             <HTML baseFontStyle={{fontSize:20}} html={item.content.rendered} />
                             </Content>
                          </Container>
                       
@@ -252,7 +252,7 @@ export default class Posts extends React.Component {
                  <Header>
                     <Left>
                         <Button transparent onPress={ () => this.props.navigation.goBack()}>
-                        <Icon name='left' />
+                        <Icon name='arrow-back' />
                         </Button>
                     </Left>
                     <Body>

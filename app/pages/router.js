@@ -1,61 +1,68 @@
 import  React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
-import { createBottomTabNavigator } from 'react-navigation';
+import { createBottomTabNavigator, createStackNavigator } from 'react-navigation';
 import Posts from './Posts';
 import Gallery from './Gallery';
 import Categories from './Categories';
 import Home from './Home'
-import { Icon } from 'react-native-elements';
+import { Icon } from 'native-base';
+
+
+const HomeStack = createStackNavigator({
+  Home:  Home
+},{headerMode: "none"});
+
+const NovelStack =  createStackNavigator({
+  Categories:  Categories,
+  Posts: Posts,
+
+},{headerMode: "none"});
+
+const GalleryStack = createStackNavigator({
+  Gallery:  Gallery
+},{headerMode: "none"});
 
 
 const App = createBottomTabNavigator({
+  
   Home: {
     name: "Home",
     description: "Home Tab",
-    screen: Home,
+    screen: HomeStack,
     navigationOptions: ({navigation}) => ({
       tabBarLabel: "主頁",
+      headerMode:"none",
       tabBarIcon: ({tintColor}) => (
-        <Icon name="ios-home-outline" type='ionicon' color={tintColor} size={iconSize}  />
+        <Icon name="home"  />
       ),
     })
   },
-  Posts: {
-    name: "Novel",
-    description: "Posts Tab",
-    screen: Posts,
+  Novel: {
+    screen: NovelStack,
+    headerMode:"none",
     navigationOptions: ({navigation}) => ({
       tabBarLabel: "小說",
+      
       tabBarIcon: ({tintColor}) => (
-        <Icon name="ios-book-outline" type='ionicon' color={tintColor} size={iconSize}  />
-      ),
-    }),
-  },
-  Categories: {
-    name: "Categories",
-    description: "Categories Tab",
-    screen: Categories,
-    navigationOptions: ({navigation}) => ({
-      tabBarLabel: "小說",
-      tabBarIcon: ({tintColor}) => (
-        <Icon name="ios-book-outline" type='ionicon' color={tintColor} size={iconSize}  />
+        <Icon name="book" />
       ),
     }),
   },
   Gallery: {
     name: "Gallery",
     description: "Gallery Tab",
-    screen: Gallery,
+    screen: GalleryStack,
+    headerMode:"none",
     navigationOptions: ({navigation}) => ({
       tabBarLabel: "插圖",
       tabBarIcon: ({tintColor}) => (
-        <Icon name="ios-images-outline" type='ionicon' color={tintColor} size={iconSize} />
+        <Icon name="images" />
       ),
     }),
   },
 }, {
   tabBarPosition: "bottom",
-  initialRouteName: "Categories",
+  initialRouteName: "Novel",
   animationEnabled: true,
   swipeEnabled: true,
   tabBarOptions: {

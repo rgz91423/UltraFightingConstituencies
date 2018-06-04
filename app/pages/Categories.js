@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, WebView, FlatList, Image, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, FlatList, Image, Dimensions, ActivityIndicator } from 'react-native';
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
-import { Header, ListItem, Avatar } from 'react-native-elements';
+import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, Thumbnail, Text } from 'native-base';
+
 
 // Initialize Firebase
 /*
@@ -25,8 +26,6 @@ export default class Categories extends React.Component {
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
         super();
-        this.itemsRef = undefined;//firebaseApp.database().ref('isUpdated');
-        this.mounted = true;
         this.state = {
             isLoading: true,
             categoryId: categoryId
@@ -84,44 +83,59 @@ export default class Categories extends React.Component {
     }
 
 
-    renderPost = ({ item }) => (
+    renderPost(item ,index) {
             
-            <ListItem
-                title={item.name}
-                onPress={() => this.goToPage(item)}
-                subtitle={item.count+"篇"}
-                containerStyle={{marginLeft:0, marginTop:0}}
-                avatar={<Avatar
-                    large
-                    source={item.img_thumbnail && {uri: item.img_thumbnail}}
-                />}
-            />  
-    )
+        return (<ListItem key={"category_"+ item.id} style={{margin:0,padding:0}} noIndent onPress={() => this.goToPage(item)}>
+            {
+            item.img_thumbnail ?  (
+            <Thumbnail square style={{marginTop:-10,marginLeft:-16,marginBottom:-10,marginRight:-10,width:128,height:128}} source={item.img_thumbnail && {uri: item.img_thumbnail}} />)
+            : ("")
+            }
+            <Body style={{marginLeft:10}}>
+                <Text style={{fontSize:18}}>{item.name}</Text>
+                <Text note>{item.count+"篇"}</Text>
+              </Body>
+              <Right>
+                <Icon name="arrow-forward" />
+            </Right>
+        </ListItem>
+         )
+    }
+
+    renderList(){
+        return (<List >
+                {
+                    this.state.categories.map((item, i) => (
+                      this.renderPost(item,i)
+                    ))
+                  }
+                </List>)
+    }
 
 
     render() {
         const isLoading = this.state.isLoading;
 
             return (
-                <View style={styles.container}>
-                    <Header
-                        centerComponent={{ text: '小說連載', style: { color: '#fff' } }}
-                        />
+                <Container>
+                    <Header>
+                        <Body>
+                            <Title>小說連載</Title>
+                        </Body>
+                    </Header>
                         {
                         isLoading ? (
                             <View style={[styles.container,styles.horizontal]}>
                                 <ActivityIndicator size="large" />
                             </View>
                         ):(   
-                            <FlatList
-                            keyExtractor={this._keyExtractor}
-                            data={this.state.categories}
-                            renderItem={this.renderPost}
-                            />
+                            <Content>
+                                { this.renderList() }
+                            </Content>
                           )
                         }
                         
-                </View>
+                </Container>
                 
             )
     }
