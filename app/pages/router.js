@@ -79,7 +79,7 @@ const App = createBottomTabNavigator({
     },
     activeTintColor: '#666',
     inactiveTintColor: '#aaa',
-    showLabel: false,
+    showLabel: true,
   }
 }); 
 

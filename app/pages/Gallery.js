@@ -87,8 +87,8 @@ export default class Gallery extends React.Component {
       }
 
 
-    renderLoading() {
-        return (<View style={[styles.container,styles.horizontal]}>
+    renderLoading(item=undefined) {
+        return (<View key={item? "loading_post_"+item.id : ''} style={[styles.container,styles.horizontal]}>
             <ActivityIndicator size="large" />
         </View>)
     }
@@ -96,16 +96,25 @@ export default class Gallery extends React.Component {
     renderPost(item,index)  {
 
         var imgUrl=this.getThumbnail(item);
+        console.log("thumbnail: "+item);
 
         return (
             <TouchableHighlight style={styles.button} onPress={() =>  this.postTapped(index)}>
-                <Image
-                source={imgUrl && { uri: imgUrl }}
-                style={styles.image}
-                />
+            <Thumbnail style={styles.image}  square source={imgUrl && { uri: imgUrl }} />
             </TouchableHighlight>
         )
            
+    }
+
+    renderList(){
+        return (<FlatList
+        numColumns={3}
+        keyExtractor={this._keyExtractor}
+        data={this.state.posts}
+        renderItem={ ({ item, index })  => this.renderPost(item,index)}
+        onEndReached={this.doInfinite}
+        onEndReachedThreshold={0.5}
+        />)
     }
 
 
@@ -122,54 +131,10 @@ export default class Gallery extends React.Component {
                     (this.state.isLoading==true) ?  (
                         this.renderLoading()
                     ) : (
-                            <Content>
-                                <FlatList
-                            numColumns={3}
-                            keyExtractor={this._keyExtractor}
-                            data={this.state.posts}
-                            renderItem={  ({ item, index })  => this.renderPost(item.index)}
-                            onEndReached={this.doInfinite}
-                            onEndReachedThreshold={0.5}
-                            />
-                            
-                            <Modal
-                            animationType="slide" 
-                            transparent={false}
-                            visible={this.state.modalVisible}
-                            onRequestClose={() => {
-                              alert('Modal has been closed.');
-                            }}>
-                            <Container>
-                             <Header>
-                                <Left/>
-                                <Body>
-                                    <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
-                                </Body>
-                                <Right>
-                                    <Button large transparent onPress={ () => this.setModalVisible(false)}>
-                                    <Icon name='close' />
-                                    </Button>
-                                </Right>
-                            </Header>
-
-
-                            <Swiper showsButtons={true}>
-                            {
-                                this.state.posts.map((item, i) => (
-                                <View >
-                                    <Text>{item.content.rendered}</Text>
-                                </View>
-                                ))
-                            }
-                            </Swiper>
-                             
-                  
-                                
-                             
-                            </Container>
-                          </Modal>
+                           <Content>
+                                {this.renderList()}
+                                {this.renderModal()}
                           </Content>
-
                             
                         )
                 }
@@ -177,6 +142,50 @@ export default class Gallery extends React.Component {
             </Container>
         );
     }
+
+
+    renderModal(){
+        return (
+            <Modal
+            animationType="slide" 
+            transparent={false}
+            visible={this.state.modalVisible}
+            onRequestClose={() => {
+              alert('Modal has been closed.');
+            }}>
+            <Container>
+             <Header>
+             <Left>
+                <Button transparent onPress={ () => this.setModalVisible(false)}>
+                <Icon name='arrow-back' />
+                </Button>
+            </Left>
+                <Body>
+                    <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
+                </Body>
+            </Header>
+
+
+            <Swiper showsButtons={true}>
+            {
+                this.state.posts.map((item, i) => (
+                <View key={"gallery_detail_"+item.id}>
+                    <Text>{"item.content.rendered"}</Text>
+                </View>
+                ))
+            }
+            </Swiper>
+             
+  
+                
+             
+            </Container>
+          </Modal>
+        )
+    }
+
+
+
 
     postTapped(index) {
          

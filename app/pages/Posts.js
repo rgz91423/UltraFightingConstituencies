@@ -3,7 +3,7 @@ import { StyleSheet, View, FlatList, Modal, TouchableHighlight, ActivityIndicato
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 //import { Header } from 'react-native-elements';
-import { Container, Text, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon } from 'native-base';
+import { Container, Text, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, DeckSwiper } from 'native-base';
 import Swiper from 'react-native-swiper';
 import HTML from 'react-native-render-html';
 //import { Icon } from 'react-native-elements';
@@ -64,7 +64,7 @@ export default class Posts extends React.Component {
 
         let post = this.state.posts[index];
 
-        if(!post || !post.detailed){
+        if(!post.detailed){
             
             WordpressService.getPost(post.id)
             .then(data => {
@@ -153,8 +153,8 @@ export default class Posts extends React.Component {
         </ListItem>)
     }
 
-    renderLoading() {
-        return (<View style={[styles.container,styles.horizontal]}>
+    renderLoading(item=undefined) {
+        return (<View key={item? "loading_post_"+item.id : ''} style={[styles.container,styles.horizontal]}>
             <ActivityIndicator size="large" />
         </View>)
     }
@@ -178,19 +178,21 @@ export default class Posts extends React.Component {
             onRequestClose={() => {
                 alert('Modal has been closed.');
             }}>
-            <View style={styles.container}>
+            <Container>
             
             <Header>
-                <Left/>
+                <Left>
+                    <Button transparent onPress={ () => this.setModalVisible(false)}>
+                    <Icon name='arrow-back' />
+                    </Button>
+                </Left>
                 <Body>
                     <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
                 </Body>
-                <Right>
-                    <Button large transparent onPress={ () => this.setModalVisible(false)}>
-                    <Icon name='close' />
-                    </Button>
-                </Right>
+                
             </Header>
+
+
 
             <Swiper 
             loop={false}
@@ -200,35 +202,42 @@ export default class Posts extends React.Component {
             >
             {
                 this.state.posts.map((item, i) => (
-                
-                    (item.content && item.content.rendered) ?
-                    (
-                        
-                        
-                        <Container style={styles.container}>
-                            <Content style={{padding:10}} >
-                                <View style={{flexDirection: "row"}}>
-                                {
-                                item.categories.map((category, i) => (
-                                    <Button style={styles.badgeButton} small warning rounded><Text>{category.name}</Text></Button>
-                                ))   
-                                }
-                                </View>
-                            
-                             <HTML baseFontStyle={{fontSize:20}} html={item.content.rendered} />
-                            </Content>
-                         </Container>
-                      
-                       
-                    ) : 
-                        this.renderLoading()
-
-                ))
+                    this.renderModalDetail(item)
+                 ))
             }
             </Swiper>
+
+           
                 
-            </View>
+            </Container>
             </Modal>)
+    }
+
+
+
+    renderModalDetail(item){
+        console.log("item");
+        console.log(item);
+        return (item.content && item.content.rendered) ?
+        (
+            
+            <Container key={"pos_detail_"+item.id} style={styles.container}>
+                <Content style={{padding:10}} >
+                    <View style={{flexDirection: "row"}}>
+                    {
+                    item.categories.map((category, i) => (
+                        <Button key={"post_category_" + item.id + "_" + category.id} style={styles.badgeButton} small warning rounded><Text>{category.name}</Text></Button>
+                    ))   
+                    }
+                    </View>
+                
+                 <HTML baseFontStyle={{fontSize:20}} html={item.content.rendered} />
+                </Content>
+             </Container>
+          
+           
+        ) : this.renderLoading()
+        
     }
 
     componentWillReceiveProps(nextProps) {
