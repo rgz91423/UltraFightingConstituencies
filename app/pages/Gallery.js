@@ -3,7 +3,7 @@ import { StyleSheet, View, FlatList, Image, Dimensions, Modal, TouchableHighligh
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
-
+import HTML from 'react-native-render-html';
 
 import Swiper from 'react-native-swiper';
 import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, Thumbnail, Text, DeckSwiper } from 'native-base';
@@ -87,6 +87,15 @@ export default class Gallery extends React.Component {
       }
 
 
+      getFullImage(item) {
+        try {
+          return item.better_featured_image.source_url; 
+        } catch (e) {
+          return undefined;
+        }
+      }
+
+
     renderLoading(item=undefined) {
         return (<View key={item? "loading_post_"+item.id : ''} style={[styles.container,styles.horizontal]}>
             <ActivityIndicator size="large" />
@@ -100,7 +109,7 @@ export default class Gallery extends React.Component {
 
         return (
             <TouchableHighlight style={styles.button} onPress={() =>  this.postTapped(index)}>
-            <Thumbnail style={styles.image}  square source={imgUrl && { uri: imgUrl }} />
+            <Image style={styles.image} source={imgUrl && { uri: imgUrl }} />
             </TouchableHighlight>
         )
            
@@ -123,7 +132,7 @@ export default class Gallery extends React.Component {
         return (
             <Container>
                 <Header>
-                    <Body>
+                    <Body style={{flex: 2}}>
                         <Title>插圖</Title>
                     </Body>
                 </Header>
@@ -160,18 +169,22 @@ export default class Gallery extends React.Component {
                 <Icon name='arrow-back' />
                 </Button>
             </Left>
-                <Body>
+                <Body style={{flex: 2}}>
                     <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
                 </Body>
+                <Right/>
             </Header>
 
 
-            <Swiper showsButtons={true}>
+            <Swiper showsButtons={false} loadMinimal={true} loadMinimalSize={1}
+            loop={false}
+            showsPagination={false}
+            index={this.state.showIndex}
+            onIndexChanged={(index)=>this.postTapped(index)}
+            >
             {
                 this.state.posts.map((item, i) => (
-                <View key={"gallery_detail_"+item.id}>
-                    <Text>{"item.content.rendered"}</Text>
-                </View>
+                    this.renderModalDetail(item)
                 ))
             }
             </Swiper>
@@ -182,6 +195,24 @@ export default class Gallery extends React.Component {
             </Container>
           </Modal>
         )
+    }
+
+    renderModalDetail(item){
+        console.log("item");
+        console.log(item);
+        var imgUrl=this.getFullImage(item);
+        console.log("full img: "+imgUrl);
+
+        return (item.content && item.content.rendered) ?
+        (
+            
+            <View style={styles.slide} key={"gallery_detail_"+item.id}>
+                    <Image resizeMode='center' style={styles.imageFull} source={imgUrl && { uri: imgUrl }} />
+            </View>
+          
+           
+        ) : this.renderLoading(item)
+        
     }
 
 
@@ -249,5 +280,17 @@ const styles = StyleSheet.create({
     height: WIDTH /3,
     margin: 1,
     flex:1,
+  },
+  imageFull: {
+      width: WIDTH,
+      flex:1
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'transparent'
+  },
+  galleryText: {
+      zIndex:5
   }
 });

@@ -186,10 +186,10 @@ export default class Posts extends React.Component {
                     <Icon name='arrow-back' />
                     </Button>
                 </Left>
-                <Body>
+                <Body style={{flex: 2}}>
                     <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
                 </Body>
-                
+                <Right/>
             </Header>
 
 
@@ -236,7 +236,7 @@ export default class Posts extends React.Component {
              </Container>
           
            
-        ) : this.renderLoading()
+        ) : this.renderLoading(item)
         
     }
 
@@ -264,7 +264,7 @@ export default class Posts extends React.Component {
                         <Icon name='arrow-back' />
                         </Button>
                     </Left>
-                    <Body>
+                    <Body style={{flex: 2}}>
                         <Title>{(this.state.isLoading ? '' : this.state.category.name)}</Title>
                     </Body>
                     <Right/>
