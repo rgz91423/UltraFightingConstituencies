@@ -3,7 +3,7 @@ import { StyleSheet, View, FlatList, Modal, TouchableHighlight, ActivityIndicato
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 //import { Header } from 'react-native-elements';
-import { Container, Text, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, DeckSwiper } from 'native-base';
+import { Container, Text, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, DeckSwiper, Footer, FooterTab } from 'native-base';
 import Swiper from 'react-native-swiper';
 import HTML from 'react-native-render-html';
 //import { Icon } from 'react-native-elements';
@@ -194,7 +194,7 @@ export default class Posts extends React.Component {
 
 
 
-            <Swiper 
+            <Swiper ref="mySwipe"
             loop={false}
             showsPagination={false}
             index={this.state.showIndex}
@@ -206,11 +206,25 @@ export default class Posts extends React.Component {
                  ))
             }
             </Swiper>
-
+            <Footer>
+                <FooterTab>
+                    <Left><Button transparent onPress={ () => this.swipe(-1)}>
+                    <Icon type="Entypo" name="triangle-left" />
+                    </Button></Left>
+                    <Right><Button transparent>
+                    <Icon type="Entypo" name="triangle-right" onPress={ () => this.swipe(1)}/>
+                    </Button></Right>
+                </FooterTab>
+            </Footer>
            
                 
             </Container>
             </Modal>)
+    }
+
+    swipe(index){
+        var mySwipe = this.refs.mySwipe;
+        mySwipe.scrollBy(index);
     }
 
 

@@ -6,8 +6,9 @@ import * as Config from '../config/config';
 import HTML from 'react-native-render-html';
 
 import Swiper from 'react-native-swiper';
-import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, Thumbnail, Text, DeckSwiper } from 'native-base';
+import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, Thumbnail, Text, DeckSwiper, Footer, FooterTab } from 'native-base';
 
+import ProImage from 'pro-image';
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -81,6 +82,14 @@ export default class Gallery extends React.Component {
     getThumbnail(item) {
         try {
           return item.better_featured_image.media_details.sizes.thumbnail.source_url; 
+        } catch (e) {
+          return undefined;
+        }
+      }
+
+      getMediumImage(item) {
+        try {
+          return item.better_featured_image.media_details.sizes.medium.source_url; 
         } catch (e) {
           return undefined;
         }
@@ -176,7 +185,7 @@ export default class Gallery extends React.Component {
             </Header>
 
 
-            <Swiper showsButtons={false} loadMinimal={true} loadMinimalSize={1}
+            <Swiper  ref="mySwipe" showsButtons={false} loadMinimal={true} loadMinimalSize={1}
             loop={false}
             showsPagination={false}
             index={this.state.showIndex}
@@ -189,7 +198,16 @@ export default class Gallery extends React.Component {
             }
             </Swiper>
              
-  
+            <Footer>
+                <FooterTab>
+                    <Left><Button transparent onPress={ () => this.swipe(-1)}>
+                    <Icon type="Entypo" name="triangle-left" />
+                    </Button></Left>
+                    <Right><Button transparent>
+                    <Icon type="Entypo" name="triangle-right" onPress={ () => this.swipe(1)}/>
+                    </Button></Right>
+                </FooterTab>
+            </Footer>
                 
              
             </Container>
@@ -201,13 +219,22 @@ export default class Gallery extends React.Component {
         console.log("item");
         console.log(item);
         var imgUrl=this.getFullImage(item);
+        var mediumImgUrl = this.getMediumImage(item);
         console.log("full img: "+imgUrl);
 
         return (item.content && item.content.rendered) ?
         (
             
             <View style={styles.slide} key={"gallery_detail_"+item.id}>
-                    <Image resizeMode='center' style={styles.imageFull} source={imgUrl && { uri: imgUrl }} />
+                    <ProImage 
+                        thumbnail={{ uri: mediumImgUrl }} 
+                        image={{ uri: imgUrl }} 
+                        style={styles.imageFull}
+                        resizeMode="contain"
+                    >
+                   
+                    </ProImage>
+                    <Text>{item.content.rendered}</Text>
             </View>
           
            
@@ -215,7 +242,10 @@ export default class Gallery extends React.Component {
         
     }
 
-
+    swipe(index){
+        var mySwipe = this.refs.mySwipe;
+        mySwipe.scrollBy(index);
+    }
 
 
     postTapped(index) {
@@ -288,7 +318,8 @@ const styles = StyleSheet.create({
   slide: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    alignItems:'center'
   },
   galleryText: {
       zIndex:5
