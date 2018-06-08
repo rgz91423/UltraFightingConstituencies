@@ -25,7 +25,7 @@ const WIDTH = Dimensions.get('window').width;
 
 export default class Gallery extends React.Component {
 
-    _keyExtractor = (item, index) => "gallery_"+item.id;
+    _keyExtractor = (item, index) => "galleryx_"+item.id;
     _keyExtractorDetail = (item, index) => "gallery_detail_"+item.id;
 
     constructor(categoryId=Config.GALLERY_CATEGORY_ID) {
@@ -38,6 +38,7 @@ export default class Gallery extends React.Component {
             modalVisible: false,
             showIndex: 0
         };
+        this.fetchAllPosts = this.fetchAllPosts.bind(this);
     }
 
     componentWillMount() {
@@ -234,7 +235,7 @@ export default class Gallery extends React.Component {
                     >
                    
                     </ProImage>
-                    <Text>{item.content.rendered}</Text>
+                    <Text style={styles.galleryText}>{item.content.rendered}</Text>
             </View>
           
            
@@ -322,6 +323,10 @@ const styles = StyleSheet.create({
     alignItems:'center'
   },
   galleryText: {
-      zIndex:5
+      zIndex:5,position:'absolute',
+      justifyContent: 'center',
+      backgroundColor: 'white',
+      opacity:.6,
+      alignItems:'center'
   }
 });
