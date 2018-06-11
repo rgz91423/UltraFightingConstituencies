@@ -146,7 +146,7 @@ export default class Posts extends React.Component {
           //subtitle={item.subtitle}
           //leftAvatar={{ source: { uri: item.avatar_url } }}
             onPress={() =>  this.postTapped(index)}>
-            <Left><Text style={{fontSize:20,padding:8}}>{item.title.rendered}</Text></Left>
+            <Left><Text style={{fontSize:18,padding:6}}>{item.title.rendered}</Text></Left>
             <Right>
                 <Icon name="arrow-forward" />
             </Right>
@@ -245,7 +245,7 @@ export default class Posts extends React.Component {
                     }
                     </View>
                 
-                 <HTML baseFontStyle={{fontSize:20}} html={item.content.rendered} />
+                 <HTML baseFontStyle={{fontSize:20}} tagsStyles={htmlstyles} html={item.content.rendered} />
                 </Content>
              </Container>
           
@@ -315,25 +315,16 @@ const styles = StyleSheet.create({
  
   
 });
-var fontSize=48;
-var htmlstyles =StyleSheet.create({
-    a: {
-            fontWeight: '300',
-            fontSize:fontSize
-    },
+
+var htmlstyles ={
+  
 p: {
-    fontSize:fontSize,
-    marginBottom:0
+    marginBottom:30,
+    lineHeight:30
 },
 div: {
-    fontSize:fontSize,
-    marginBottom:0,
-},
-strong:{
-    fontWeight:'bold',
-    fontSize:fontSize
-},
-li:{
-    fontSize:fontSize,
+    marginBottom:30,
+    lineHeight:30
 }
-})
+
+};

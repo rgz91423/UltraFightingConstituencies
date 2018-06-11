@@ -3,12 +3,13 @@ import { StyleSheet, View, FlatList, Image, Dimensions, Modal, TouchableHighligh
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
-import HTML from 'react-native-render-html';
+
 
 import Swiper from 'react-native-swiper';
 import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, Thumbnail, Text, DeckSwiper, Footer, FooterTab } from 'native-base';
 
 import ProImage from 'pro-image';
+import HTML from 'react-native-render-html';
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -235,7 +236,7 @@ export default class Gallery extends React.Component {
                     >
                    
                     </ProImage>
-                    <Text style={styles.galleryText}>{item.content.rendered}</Text>
+                    <HTML containerStyle={styles.galleryText} baseFontStyle={{fontSize:16}} tagsStyles={htmlstyles} html={item.content.rendered} />
             </View>
           
            
@@ -330,3 +331,17 @@ const styles = StyleSheet.create({
       alignItems:'center'
   }
 });
+
+
+var htmlstyles ={
+  
+    p: {
+        marginBottom:30,
+        lineHeight:30
+    },
+    div: {
+        marginBottom:30,
+        lineHeight:30
+    }
+    
+};
