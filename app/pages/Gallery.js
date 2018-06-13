@@ -227,17 +227,16 @@ export default class Gallery extends React.Component {
         return (item.content && item.content.rendered) ?
         (
             
-            <View style={styles.slide} key={"gallery_detail_"+item.id}>
+            <Content style={styles.slide} key={"gallery_detail_"+item.id}>
                     <ProImage 
                         thumbnail={{ uri: mediumImgUrl }} 
                         image={{ uri: imgUrl }} 
                         style={styles.imageFull}
-                        resizeMode="contain"
                     >
                    
                     </ProImage>
                     <HTML containerStyle={styles.galleryText} baseFontStyle={{fontSize:16}} tagsStyles={htmlstyles} html={item.content.rendered} />
-            </View>
+            </Content>
           
            
         ) : this.renderLoading(item)
@@ -319,15 +318,16 @@ const styles = StyleSheet.create({
   },
   slide: {
     flex: 1,
-    justifyContent: 'center',
+   // justifyContent: 'center',
     backgroundColor: 'transparent',
-    alignItems:'center'
+  //  alignItems:'center'
   },
   galleryText: {
-      zIndex:5,position:'absolute',
-      justifyContent: 'center',
+      //zIndex:5,position:'absolute',
+      //justifyContent: 'center',
       backgroundColor: 'white',
-      opacity:.6,
+      //opacity:.6,
+      flex:1,
       alignItems:'center'
   }
 });
@@ -336,12 +336,12 @@ const styles = StyleSheet.create({
 var htmlstyles ={
   
     p: {
-        marginBottom:30,
-        lineHeight:30
+        marginBottom:20,
+        lineHeight:20
     },
     div: {
-        marginBottom:30,
-        lineHeight:30
+        marginBottom:20,
+        lineHeight:20
     }
     
 };
