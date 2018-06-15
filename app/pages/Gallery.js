@@ -23,6 +23,7 @@ const firebaseConfig = {
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 */
 const WIDTH = Dimensions.get('window').width;
+const HEIGHT = Dimensions.get('window').height;
 
 export default class Gallery extends React.Component {
 
@@ -100,7 +101,7 @@ export default class Gallery extends React.Component {
 
       getFullImage(item) {
         try {
-          return item.better_featured_image.source_url; 
+          return item.better_featured_image.media_details.sizes.large.source_url; 
         } catch (e) {
           return undefined;
         }
@@ -132,8 +133,6 @@ export default class Gallery extends React.Component {
         keyExtractor={this._keyExtractor}
         data={this.state.posts}
         renderItem={ ({ item, index })  => this.renderPost(item,index)}
-        onEndReached={this.doInfinite}
-        onEndReachedThreshold={0.5}
         />)
     }
 
@@ -219,23 +218,19 @@ export default class Gallery extends React.Component {
 
     renderModalDetail(item){
         console.log("item");
-        console.log(item);
-        var imgUrl=this.getFullImage(item);
-        var mediumImgUrl = this.getMediumImage(item);
-        console.log("full img: "+imgUrl);
-
+        
         return (item.content && item.content.rendered) ?
         (
             
             <Content style={styles.slide} key={"gallery_detail_"+item.id}>
                     <ProImage 
-                        thumbnail={{ uri: mediumImgUrl }} 
-                        image={{ uri: imgUrl }} 
-                        style={styles.imageFull}
+                        thumbnail={{ uri: this.getMediumImage(item) }} 
+                        image={{ uri: this.getFullImage(item) }} 
+                        style={styles.imageFull} 
+                        resizeMode="cover"
                     >
-                   
                     </ProImage>
-                    <HTML containerStyle={styles.galleryText} baseFontStyle={{fontSize:16}} tagsStyles={htmlstyles} html={item.content.rendered} />
+                 <HTML containerStyle={styles.galleryText} baseFontStyle={{fontSize:16}} tagsStyles={htmlstyles} html={item.content.rendered} />
             </Content>
           
            
@@ -249,28 +244,36 @@ export default class Gallery extends React.Component {
     }
 
 
+   
+
     postTapped(index) {
          
         this.setState({
             showIndex:index,modalVisible: true
         });
 
+        let post = this.state.posts[index];
+
+        if(!post.detailed){
+            
+            WordpressService.getPost(post.id)
+            .then(data => {
+                post = data;
+                post.detailed=true;
+                
+                let tmpPosts = this.state.posts;
+                tmpPosts[index] = post;
+                this.setState({posts: tmpPosts});
+                
+                
+            });
+          }
+      
+
     }
 
 
-    doInfinite = () => {
-       // try {
-            let page = (Math.ceil(this.state.posts.length/Config.QUERY_SIZE_GALLERY)) + 1;
-        
-            WordpressService.getGallery(5, page)
-            .then(data => {
-                console.log('onEndReached()', this.state.posts)
-                let curData = this.state.posts
-                let newData = curData.concat(data);
-                this.setState({posts: newData})
-            }).done();
-       // } catch (e) {}
-      }
+  
     
 }
 
@@ -308,27 +311,26 @@ const styles = StyleSheet.create({
     flex:2,
   },
   image: {
-    height: WIDTH /3,
+    width: WIDTH / 3,
+    height: WIDTH / 3,
     margin: 1,
     flex:1,
   },
   imageFull: {
-      width: WIDTH,
-      flex:1
+     width: WIDTH,
+     height: HEIGHT,
   },
   slide: {
     flex: 1,
-   // justifyContent: 'center',
+   
     backgroundColor: 'transparent',
-  //  alignItems:'center'
+    
   },
   galleryText: {
       //zIndex:5,position:'absolute',
       //justifyContent: 'center',
-      backgroundColor: 'white',
       //opacity:.6,
       flex:1,
-      alignItems:'center'
   }
 });
 

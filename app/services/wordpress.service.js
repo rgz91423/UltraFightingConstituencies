@@ -72,8 +72,8 @@ export class WordpressService {
     return fetch(
       Config.WORDPRESS_REST_API_URL
       + 'posts?page=' + page
-      + '&per_page=' + Config.QUERY_SIZE_GALLERY
-     // + '&fields=id,title.rendered,featured_media,_links'
+      + '&per_page=' + Config.QUERY_SIZE_BIG
+      + '&fields=id,title.rendered,better_featured_image.media_details.sizes.thumbnail.source_url'
       + category_url)
     .then(res => res.json());
   }
