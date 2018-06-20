@@ -287,26 +287,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 10
   },
-  card: {
-      backgroundColor: '#fff',
-      padding: 20,
-      marginTop: 0,
-      borderStyle: 'solid',
-      borderColor: '#ccc',
-      borderWidth: 1,
-      fontSize:20
-  },
-  GridViewBlockStyle: {
- 
-    justifyContent: 'center',
-    flex:1,
-    alignItems: 'center',
-    width: WIDTH / 3,
-    height: WIDTH /3,
-    margin: 5,
-    backgroundColor: '#00BCD4'
-   
-  }, 
+  
+  
   button: {
     flex:2,
   },
@@ -317,8 +299,9 @@ const styles = StyleSheet.create({
     flex:1,
   },
   imageFull: {
-     width: WIDTH,
-     height: HEIGHT,
+    flex:1,
+    width: WIDTH,
+    height: HEIGHT,
   },
   slide: {
     flex: 1,
