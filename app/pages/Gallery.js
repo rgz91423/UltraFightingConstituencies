@@ -186,7 +186,7 @@ export default class Gallery extends React.Component {
             </Header>
 
 
-            <Swiper  ref="mySwipe" showsButtons={false} loadMinimal={true} loadMinimalSize={1}
+            <Swiper ref="mySwipe" showsButtons={false} loadMinimal={true} loadMinimalSize={1}
             loop={false}
             showsPagination={false}
             index={this.state.showIndex}
@@ -223,13 +223,12 @@ export default class Gallery extends React.Component {
         (
             
             <Content style={styles.slide} key={"gallery_detail_"+item.id}>
-                    <ProImage 
-                        thumbnail={{ uri: this.getMediumImage(item) }} 
-                        image={{ uri: this.getFullImage(item) }} 
+                    <Image 
+                        source={{ uri: this.getFullImage(item) }} 
                         style={styles.imageFull} 
                         resizeMode="cover"
                     >
-                    </ProImage>
+                    </Image>
                  <HTML containerStyle={styles.galleryText} baseFontStyle={{fontSize:16}} tagsStyles={htmlstyles} html={item.content.rendered} />
             </Content>
           
@@ -287,8 +286,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 10
   },
-  
-  
+  card: {
+      backgroundColor: '#fff',
+      padding: 20,
+      marginTop: 0,
+      borderStyle: 'solid',
+      borderColor: '#ccc',
+      borderWidth: 1,
+      fontSize:20
+  },
+  GridViewBlockStyle: {
+ 
+    justifyContent: 'center',
+    flex:1,
+    alignItems: 'center',
+    width: WIDTH / 3,
+    height: WIDTH /3,
+    margin: 5,
+    backgroundColor: '#00BCD4'
+   
+  }, 
   button: {
     flex:2,
   },
@@ -299,9 +316,8 @@ const styles = StyleSheet.create({
     flex:1,
   },
   imageFull: {
-    flex:1,
-    width: WIDTH,
-    height: HEIGHT,
+     width: WIDTH,
+     height: HEIGHT,
   },
   slide: {
     flex: 1,
