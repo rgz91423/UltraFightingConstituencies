@@ -3,7 +3,7 @@ import { StyleSheet, View, FlatList, Image, Dimensions, Modal, TouchableHighligh
 import Post from './Post';
 import { WordpressService } from '../services/wordpress.service';
 import * as Config from '../config/config';
-
+import Collapsible from 'react-native-collapsible';
 
 import Swiper from 'react-native-swiper';
 import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Title, Icon, Thumbnail, Text, DeckSwiper, Footer, FooterTab } from 'native-base';
@@ -38,10 +38,15 @@ export default class Gallery extends React.Component {
             categoryId: categoryId,
             posts: undefined,
             modalVisible: false,
-            showIndex: 0
+            showIndex: 0,
+            collapsed:true
         };
         this.fetchAllPosts = this.fetchAllPosts.bind(this);
     }
+
+    _toggleExpanded = () => {
+        this.setState({ collapsed: !this.state.collapsed });
+      };
 
     componentWillMount() {
         /*
@@ -224,12 +229,25 @@ export default class Gallery extends React.Component {
             
             <Content style={styles.slide} key={"gallery_detail_"+item.id}>
                     <Image 
+                        loadingIndicatorSource={{ uri: this.getMediumImage(item) }} 
                         source={{ uri: this.getFullImage(item) }} 
                         style={styles.imageFull} 
-                        resizeMode="cover"
+                        resizeMode="contain"
                     >
                     </Image>
-                 <HTML containerStyle={styles.galleryText} baseFontStyle={{fontSize:16}} tagsStyles={htmlstyles} html={item.content.rendered} />
+
+                    <Button transparent onPress={this._toggleExpanded}>
+                        <Icon name='arrow-back' />
+                    </Button>
+                     <Collapsible collapsed={this.state.collapsed}>
+                        <HTML  
+                        containerStyle={styles.galleryText} 
+                        baseFontStyle={{fontSize:16}} 
+                        tagsStyles={htmlstyles} 
+                        ignoredStyles={[ 'font-family', 'line-height']}
+                        html={item.content.rendered} />
+                    </Collapsible>
+                 
             </Content>
           
            
@@ -248,7 +266,7 @@ export default class Gallery extends React.Component {
     postTapped(index) {
          
         this.setState({
-            showIndex:index,modalVisible: true
+            showIndex:index,modalVisible: true,collapsed:true
         });
 
         let post = this.state.posts[index];
@@ -317,7 +335,8 @@ const styles = StyleSheet.create({
   },
   imageFull: {
      width: WIDTH,
-     height: HEIGHT,
+     height: HEIGHT-120,
+     flex:1
   },
   slide: {
     flex: 1,
@@ -326,9 +345,10 @@ const styles = StyleSheet.create({
     
   },
   galleryText: {
-      //zIndex:5,position:'absolute',
+    zIndex:5,position:'absolute',top:0,
       //justifyContent: 'center',
       //opacity:.6,
+      padding:10,
       flex:1,
   }
 });
