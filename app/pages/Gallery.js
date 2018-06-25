@@ -10,6 +10,11 @@ import { Container, Header, Content, Button, List, ListItem,Left, Body, Right,Ti
 
 import ProImage from 'pro-image';
 import HTML from 'react-native-render-html';
+
+
+import AddPaging from 'react-native-paged-scroll-view';
+import InvertibleScrollView from 'react-native-invertible-scroll-view';
+var InvertiblePagedScrollView = AddPaging(InvertibleScrollView)
 // Initialize Firebase
 /*
 const firebaseConfig = {
@@ -185,7 +190,7 @@ export default class Gallery extends React.Component {
                 </Button>
             </Left>
                 <Body style={{flex: 2}}>
-                    <Title>{this.state.posts[this.state.showIndex].title.rendered}</Title>
+                    <Title>xxx{this.state.posts[this.state.showIndex].title.rendered}</Title>
                 </Body>
                 <Right/>
             </Header>
@@ -228,25 +233,29 @@ export default class Gallery extends React.Component {
         (
             
             <Content style={styles.slide} key={"gallery_detail_"+item.id}>
-                    <Image 
+
+
+             <InvertiblePagedScrollView>
+                <View style={{width: WIDTH, height: HEIGHT-120}}><Image 
                         loadingIndicatorSource={{ uri: this.getMediumImage(item) }} 
                         source={{ uri: this.getFullImage(item) }} 
                         style={styles.imageFull} 
                         resizeMode="contain"
                     >
-                    </Image>
-
-                    <Button transparent onPress={this._toggleExpanded}>
-                        <Icon name='arrow-back' />
-                    </Button>
-                     <Collapsible collapsed={this.state.collapsed}>
+                </Image></View>
+                <View style={{width: WIDTH, height: HEIGHT-120}}>
                         <HTML  
                         containerStyle={styles.galleryText} 
                         baseFontStyle={{fontSize:16}} 
                         tagsStyles={htmlstyles} 
                         ignoredStyles={[ 'font-family', 'line-height']}
                         html={item.content.rendered} />
-                    </Collapsible>
+                    </View>
+            </InvertiblePagedScrollView>
+                    
+
+                    
+                     
                  
             </Content>
           
